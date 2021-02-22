@@ -178,3 +178,46 @@ func (c *Client) UpdateTeamPreferences(id int64, preferences Preferences) error 
 
 	return c.request("PUT", path, nil, bytes.NewBuffer(data), nil)
 }
+
+// NewTeamRole assigns the role to the team. Available only in Grafana Enterprise.
+func (c *Client) NewTeamRole(id int64, roleUID string) error {
+	path := fmt.Sprintf("/api/access-control/teams/%d/roles", id)
+	req := struct {
+		RoleUID string `json:"role_uid"`
+
+	}{
+		RoleUID: roleUID,
+	}
+
+	data, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
+
+	err = c.request("POST", path, nil, bytes.NewBuffer(data), nil)
+
+	return err
+}
+
+// DeleteTeamRole removes role assignment from the team. Available only in Grafana Enterprise.
+func (c *Client) DeleteTeamRole(id int64, roleUID string) error {
+	path := fmt.Sprintf("/api/access-control/teams/%d/roles/%s", id, roleUID)
+
+	err := c.request("DELETE", path, nil, nil, nil)
+
+	return err
+}
+
+// GetTeamRoles gets roles assigned to the team. Available only in Grafana Enterprise.
+func (c *Client) GetTeamRoles(id int64) ([]*Role, error) {
+	roles := make([]*Role, 0)
+
+	path := fmt.Sprintf("/api/access-control/teams/%d/roles", id)
+
+	err := c.request("GET", path, nil, nil, &roles)
+	if err != nil {
+		return nil, err
+	}
+
+	return roles, nil
+}

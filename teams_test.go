@@ -87,6 +87,39 @@ const (
   "message":"Preferences updated"
 }
 `
+
+	createTeamRoleJSON = `
+{
+  "message":"Role added to the team."
+}
+`
+	deleteTeamRoleJSON = `
+{
+  "message":"Role removed from the team."
+}
+`
+	getTeamRolesJSON = `
+[
+{
+    "orgId": 1,
+    "uid": "vc3SCSsGz",
+    "name": "test:policy",
+	"version": 1,
+    "description": "Test policy description",
+    "permissions": [
+        {
+            "id": 6,
+            "permission": "test:self",
+            "scope": "test:self",
+            "updated": "2021-02-22T16:16:05.646913+01:00",
+            "created": "2021-02-22T16:16:05.646912+01:00"
+        }
+    ],
+    "updated": "2021-02-22T16:16:05.644216+01:00",
+    "created": "2021-02-22T16:16:05.644216+01:00"
+}
+]
+`
 )
 
 func TestSearchTeam(t *testing.T) {
@@ -293,6 +326,70 @@ func TestUpdateTeamPreferences(t *testing.T) {
 	}
 
 	if err := client.UpdateTeamPreferences(id, preferences); err != nil {
+		t.Error(err)
+	}
+}
+
+func TestNewTeamRole(t *testing.T) {
+	server, client := gapiTestTools(t, 201, createTeamRoleJSON)
+	t.Cleanup(func() {
+		server.Close()
+	})
+
+	id := int64(1)
+
+	if err := client.NewTeamRole(id, "vc3SCSsGz"); err != nil {
+		t.Error(err)
+	}
+}
+
+func TestGetTeamRoles(t *testing.T) {
+	server, client := gapiTestTools(t, 200, getTeamRolesJSON)
+	t.Cleanup(func() {
+		server.Close()
+	})
+
+	id := int64(1)
+
+	resp, err := client.GetTeamRoles(id)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	expected := []*Role{
+		{
+			OrgID:       1,
+			Version:     1,
+			UID:         "vc3SCSsGz",
+			Name:        "test:policy",
+			Description: "Test policy description",
+			Permissions: []Permission{
+				{
+					Action: "test:self",
+					Scope:  "test:self",
+				},
+			},
+		}}
+
+	for i, expect := range expected {
+		t.Run("check response data", func(t *testing.T) {
+			if expect.UID != resp[i].UID || expect.Name != resp[i].Name {
+				t.Error("Not correctly parsing returned team roles.")
+			}
+		})
+	}
+}
+
+func TestDeleteTeamRole(t *testing.T) {
+	server, client := gapiTestTools(t, 200, deleteTeamRoleJSON)
+	t.Cleanup(func() {
+		server.Close()
+	})
+
+	id := int64(1)
+
+	if err := client.DeleteTeamRole(id, "vc3SCSsGz"); err != nil {
 		t.Error(err)
 	}
 }
