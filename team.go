@@ -183,7 +183,7 @@ func (c *Client) UpdateTeamPreferences(id int64, preferences Preferences) error 
 func (c *Client) NewTeamRole(id int64, roleUID string) error {
 	path := fmt.Sprintf("/api/access-control/teams/%d/roles", id)
 	req := struct {
-		RoleUID string `json:"role_uid"`
+		RoleUID string `json:"roleUid"`
 
 	}{
 		RoleUID: roleUID,

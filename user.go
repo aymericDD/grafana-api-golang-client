@@ -77,7 +77,7 @@ func (c *Client) UserUpdate(u User) error {
 func (c *Client) NewUserRole(id int64, roleUID string) error {
 	path := fmt.Sprintf("/api/access-control/users/%d/roles", id)
 	req := struct {
-		RoleUID string `json:"role_uid"`
+		RoleUID string `json:"roleUid"`
 	}{
 		RoleUID: roleUID,
 	}
