@@ -7,7 +7,6 @@ import (
 )
 
 type Role struct {
-	OrgID       int64        `json:"orgId"`
 	Version     int64        `json:"version"`
 	UID         string       `json:"uid,omitempty"`
 	Name        string       `json:"name"`
